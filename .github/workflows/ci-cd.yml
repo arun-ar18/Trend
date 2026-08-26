@@ -16,6 +16,22 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      - name: Check Docker Hub secret format
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          echo "Token length: ${#DOCKERHUB_TOKEN}"
+          if [[ "$DOCKERHUB_TOKEN" == dckr_pat_* ]]; then
+            echo "Token prefix: OK"
+          else
+            echo "Token prefix: NOT OK"
+          fi
+          if [[ "$DOCKERHUB_TOKEN" == *$'\n'* || "$DOCKERHUB_TOKEN" == *$'\r'* ]]; then
+            echo "Token contains a newline: YES"
+          else
+            echo "Token contains a newline: NO"
+          fi
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v4
         with:
