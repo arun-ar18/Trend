@@ -18,23 +18,7 @@ jobs:
           docker --version
           docker version
 
-      - name: Log in to Docker Hub
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Test Docker Hub registry
         run: |
-          echo "$DOCKERHUB_TOKEN" | docker login \
-            --username "$DOCKERHUB_USERNAME" \
-            --password-stdin
-
-      - name: Build Docker image
-        run: |
-          docker build -t arunar86/trend-app:latest .
-
-      - name: Push Docker image to Docker Hub
-        run: |
-          docker push arunar86/trend-app:latest
-
-      - name: Verify Docker image
-        run: |
-          docker images
+          echo "Testing Docker Hub registry..."
+          curl -i https://registry-1.docker.io/v2/
