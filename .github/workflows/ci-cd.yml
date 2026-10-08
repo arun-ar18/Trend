@@ -18,7 +18,9 @@ jobs:
           docker --version
           docker version
 
-      - name: Test Docker Hub registry
+      - name: Test Docker Hub token service
         run: |
-          echo "Testing Docker Hub registry..."
-          curl -i https://registry-1.docker.io/v2/
+          echo "Testing Docker Hub token service..."
+
+          curl -i \
+            "https://auth.docker.io/token?service=registry.docker.io&scope=repository:arunar86/trend-app:pull,push"
