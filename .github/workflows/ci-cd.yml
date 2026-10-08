@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   docker-build-and-push:
@@ -16,20 +13,18 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Log in to Docker Hub
+      - name: Test Docker Hub API authentication
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          printf '%s' "$DOCKERHUB_TOKEN" | docker login docker.io \
-            --username "$DOCKERHUB_USERNAME" \
-            --password-stdin
+          echo "Testing Docker Hub authentication API..."
 
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/trend-app:latest .
+          curl -sS -o /tmp/docker-auth-response.json \
+            -w "HTTP status: %{http_code}\n" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"identifier\":\"$DOCKERHUB_USERNAME\",\"secret\":\"$DOCKERHUB_TOKEN\"}" \
+            https://hub.docker.com/v2/auth/token
 
-      - name: Push Docker image to Docker Hub
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/trend-app:latest
-
-      - name: Verify Docker image
-        run: docker images
+          echo "Response received from Docker Hub."
